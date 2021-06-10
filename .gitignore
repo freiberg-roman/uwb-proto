@@ -130,3 +130,7 @@ dmypy.json
 
 # PyCharm
 .idea/
+
+# experiment data
+uwb/exp/
+exp/

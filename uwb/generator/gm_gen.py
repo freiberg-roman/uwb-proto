@@ -1,4 +1,4 @@
-from generator import BaseGenerator
+from uwb.generator import BaseGenerator
 
 
 class GaussianMixtureGenerator(BaseGenerator):

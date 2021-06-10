@@ -1,12 +1,12 @@
-default:
-  - generator: blob_gen
+defaults:
   - algorithm: mnmapf
+  - generator: blob_gen
 
 
 root_dir: "./exp"
 hydra:
   run:
-    dir: ${root_dir}/${algortihm.name}/${generator.name}/${now:%Y.%m.%d}/${now:%H%M%S}
+    dir: ${root_dir}/${algorithm.name}/${generator.name}/${now:%Y.%m.%d}/${now:%H%M%S}
 
   sweep:
-    dir: ${root_dir}/${algortihm.name}/${generator.name}/${now:%Y.%m.%d}/${now:%H%M%S}
+    dir: ${root_dir}/${algorithm.name}/${generator.name}/${now:%Y.%m.%d}/${now:%H%M%S}

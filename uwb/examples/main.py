@@ -1,6 +1,7 @@
 import hydra
 from omegaconf import DictConfig, OmegaConf
-from generator import BlobGenerator
+
+from uwb.generator import BlobGenerator
 
 
 @hydra.main(config_path="conf", config_name="main")

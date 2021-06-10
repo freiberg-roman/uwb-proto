@@ -1,0 +1,12 @@
+default:
+  - generator: blob_gen
+  - algorithm: mnmapf
+
+
+root_dir: "./exp"
+hydra:
+  run:
+    dir: ${root_dir}/${algortihm.name}/${generator.name}/${now:%Y.%m.%d}/${now:%H%M%S}
+
+  sweep:
+    dir: ${root_dir}/${algortihm.name}/${generator.name}/${now:%Y.%m.%d}/${now:%H%M%S}

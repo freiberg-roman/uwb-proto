@@ -7,8 +7,17 @@ from uwb.generator import BlobGenerator
 @hydra.main(config_path="conf", config_name="main")
 def run(cfg: DictConfig):
     print(OmegaConf.to_yaml(cfg))
-    gen = BlobGenerator(100, 200, 10, 50, (1, 3))
-    gen.gen()
+
+    # generate multimodal data for a simple grid
+    gen = BlobGenerator(
+        cfg.generator.grid_length,
+        cfg.generator.grid_width,
+        cfg.generator.step_size,
+        cfg.generator.measurements_per_location,
+        (cfg.generator.modal_range[0], cfg.generator.modal_range[1]),
+    )
+    data = gen.gen()
+    print(data.shape)
 
 
 if __name__ == "__main__":

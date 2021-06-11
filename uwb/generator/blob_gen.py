@@ -41,8 +41,8 @@ class BlobGenerator(BaseGenerator):
         )
 
         # calculate centers
-        grid_width = (np.array(range(width)) + 1) * self.step
-        grid_length = (np.array(range(length)) + 1) * self.step
+        grid_width = (np.arange(width) + 1) * self.step
+        grid_length = (np.arange(length) + 1) * self.step
         mean = np.array(
             [
                 np.repeat(grid_width, len(grid_length)),

@@ -21,7 +21,7 @@ class BlobGenerator(BaseGenerator):
         step_size: int,
         measurements_per_location: int,
         modal_range: Tuple[int, int],
-        deviation: float = 1.0,
+        deviation: float = 10.0,
     ):
         super().__init__()
         self.length = grid_length

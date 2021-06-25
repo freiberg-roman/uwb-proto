@@ -18,7 +18,7 @@ repos:
       - id: isort
         files: 'tests/.*'
 
-  - repo: local
+  - repo: local  # make sure to have python jupyter installed
     hooks:
       - id: jupyter-nb-clear-output
         name: jupyter-nb-clear-output

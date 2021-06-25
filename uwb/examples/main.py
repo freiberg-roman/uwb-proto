@@ -10,12 +10,15 @@ def run(cfg: DictConfig):
 
     # generate multimodal data for a simple grid
     gen = BlobGenerator(
-        [10, 20],
+        [2, 2],
         cfg.generator.step_size,
         cfg.generator.measurements_per_location,
         (cfg.generator.modal_range[0], cfg.generator.modal_range[1]),
     )
     data = gen.gen()
+
+    for d in gen:
+        print(d[0].shape)
     print(data.shape)
 
 

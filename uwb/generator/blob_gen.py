@@ -31,6 +31,8 @@ class BlobGenerator(BaseGenerator):
         self.deviation = deviation
         self.grid_dims = grid_dims
         self.grid = []
+        self._data = None
+        self._iter = None
 
         for dim in grid_dims:
             self.grid.append((np.arange(dim) + 1) * step_size)
@@ -60,6 +62,8 @@ class BlobGenerator(BaseGenerator):
             samples[idxs] = make_blobs(
                 n_samples=self.amount, centers=(centers[idxs][:, 0 : clusters[idxs]]).T
             )[0]
+
+        self._data = samples
         return samples
 
     def get_closest_position(self, coordinates):
@@ -78,3 +82,18 @@ class BlobGenerator(BaseGenerator):
             pos[:, i] = i_pos
 
         return pos
+
+    def __iter__(self):
+        if self._data is None:
+            self.gen()
+        return self
+
+    def __next__(self):
+        if self._iter is None:
+            self._iter = product(*[range(i) for i in self.grid_dims])
+        idx = next(self._iter)
+        return self._data[idx], idx
+
+    @property
+    def shape(self):
+        return tuple(self.grid_dims)

@@ -91,8 +91,16 @@ class BlobGenerator(BaseGenerator):
     def __next__(self):
         if self._iter is None:
             self._iter = product(*[range(i) for i in self.grid_dims])
-        idx = next(self._iter)
-        return self._data[idx], idx
+        try:
+            idx = next(self._iter)
+        except StopIteration:
+            self._iter = None
+            raise StopIteration
+        return (
+            self._data[idx],
+            idx,
+            (np.array(idx) + 1) * self.step,
+        )  # samples, index, position
 
     @property
     def shape(self):

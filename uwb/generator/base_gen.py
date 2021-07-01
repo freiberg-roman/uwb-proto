@@ -22,6 +22,9 @@ class BaseGenerator:
         """
         pass
 
+    def get_closest_position(self):
+        pass
+
     @property
     def shape(self):
         """

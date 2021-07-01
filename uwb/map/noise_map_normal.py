@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.stats import multivariate_normal
 
 from uwb.generator import BaseGenerator
 from uwb.map import NoiseMap
@@ -14,6 +15,15 @@ class NoiseMapNormal(NoiseMap):
 
     def gen(self):
         """Calculates estimates for a gaussian estimate"""
+
         for (samples, idxs, pos) in self.measurement_generator:
             self.means[idxs[:-1]] = samples.mean(axis=0) - pos
             self.covs[idxs[:-1]] = np.cov(samples.T)
+
+    def conditioned_probability(self, z, samples):
+        pos = self.measurement_generator.get_closest_position(samples)
+        return multivariate_normal.pdf(z, mean=self.means[pos], cov=self.covs[pos])
+
+    def sample_from(self, coordinates):
+        pos = self.measurement_generator.get_closest_position(coordinates)
+        return multivariate_normal.rvs(mean=self.means[pos], cov=self.covs[pos])

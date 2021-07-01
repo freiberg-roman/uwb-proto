@@ -17,6 +17,9 @@ class NoiseMap:
         """
         pass
 
-    def conditioned_probability(self, coordinates):
+    def conditioned_probability(self, z, samples):
         """"""
+        pass
+
+    def sample_from(self, coordinates):
         pass

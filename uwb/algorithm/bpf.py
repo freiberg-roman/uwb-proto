@@ -4,7 +4,6 @@ from uwb.map import NoiseMapNormal
 
 
 class BPF:
-    # TODO basic particle filter
     def __init__(
         self, map: NoiseMapNormal, dyn_model, init_samples, init_vel, init_weights
     ):

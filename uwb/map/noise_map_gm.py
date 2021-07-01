@@ -2,6 +2,7 @@ from copy import deepcopy
 from functools import reduce
 
 import numpy as np
+from scipy.stats import multivariate_normal
 from sklearn.cluster import DBSCAN
 
 from uwb.generator import BaseGenerator
@@ -28,6 +29,7 @@ class NoiseMapGM(NoiseMap):
                 return [_rec_array(deepcopy(shapes)) for _ in range(first)]
 
         self.params = _rec_array(list(measurement_generator.shape))
+        self._dim = sum(map(lambda x: 1, list(measurement_generator.shape)))
 
     def gen(self):
         """Calculates estimates.
@@ -45,9 +47,42 @@ class NoiseMapGM(NoiseMap):
             param_list = reduce(lambda params, idx: params[idx], idxs, self.params)
             used_data = samples.shape[0] - n_noise
 
+            weights = []
+            means = []
+            covariances = []
+
             for i in range(n_clusters):
                 mask = labels == i
-                mean_noise = samples[mask, :].mean(axis=0) - pos
-                cov_noise = np.cov(samples[mask, :].T)
-                weight = mask.sum() / used_data
-                param_list.append((mean_noise, cov_noise, weight, pos))
+                means.append(samples[mask, :].mean(axis=0) - pos)
+                covariances.append(np.cov(samples[mask, :].T))
+                weights.append(mask.sum() / used_data)
+
+            weights = np.stack(weights)
+            means = np.stack(means)
+            covariances = np.stack(covariances)
+            param_list.append((weights, means, covariances))
+
+    def sample_from(self, coordinates):
+        positions = self.measurement_generator.get_closest_position(coordinates)
+        samples = np.empty_like(positions)
+        for i, p in enumerate(positions):
+            weights, means, covs = self[p]
+            selection = np.random.choice(np.arange(len(weights)), p=weights)
+            samples[(i,) + p] = multivariate_normal.rvs(
+                mean=means[selection], cov=covs[selection]
+            )
+        return samples
+
+    def conditioned_probability(self, z, samples):
+        positions = self.measurement_generator.get_closest_position(samples)
+        prob = np.zeros((len(z)))
+        for i, p in enumerate(positions):
+            weights, means, covs = self[p]
+            for w in enumerate(weights):
+                prob += w * multivariate_normal.pdf(mean=means[i], cov=covs[i])
+        return prob
+
+    def __getitem__(self, item):
+        if len(item) == self._dim:
+            param_list = reduce(lambda params, idx: params[idx], item, self.params)
+            return param_list[0]

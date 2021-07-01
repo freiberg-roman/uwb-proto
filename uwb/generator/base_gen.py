@@ -22,7 +22,7 @@ class BaseGenerator:
         """
         pass
 
-    def get_closest_position(self):
+    def get_closest_position(self, coordinates):
         pass
 
     @property

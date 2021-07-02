@@ -1,5 +1,6 @@
 defaults:
   - algorithm: mnmapf
+  - dynamics: normal_dynamics
   - map: noise_map_gm
   - generator: blob_gen
 

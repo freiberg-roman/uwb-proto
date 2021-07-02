@@ -11,21 +11,19 @@ class NoiseMapNormal(NoiseMap):
     this class provides a noise map with sampling and conditional probabilities functionality.
 
     Attributes:
-        measurement_generator: generator that provides measurements for given position
+        generator: generator that provides measurements for given position
           this class must be iterable with valid format of (samples, idx, position).
     """
 
-    def __init__(self, measurement_generator):
+    def __init__(self, generator):
         """Inits and allocates numpy arrays for parameters."""
-        self.measurement_generator = measurement_generator
-        self.means = np.zeros(measurement_generator.shape)
-        self.covs = np.zeros(
-            measurement_generator.shape + (measurement_generator.shape[-1],)
-        )
+        super().__init__(generator)
+        self.means = np.zeros(generator.shape)
+        self.covs = np.zeros(generator.shape + (generator.shape[-1],))
 
     def gen(self):
         """Calculates estimates for a gaussian distribution"""
-        for (samples, idxs, pos) in self.measurement_generator:
+        for (samples, idxs, pos) in self.gen:
             self.means[idxs[:-1]] = samples.mean(axis=0) - pos
             self.covs[idxs[:-1]] = np.cov(samples.T)
 
@@ -39,7 +37,7 @@ class NoiseMapNormal(NoiseMap):
             z: Numpy array of measurements with format (N,d).
             particles: particles from the particle filter used for density estimation.
         """
-        pos = self.measurement_generator.get_closest_position(particles)
+        pos = self.gen.get_closest_position(particles)
         return multivariate_normal.pdf(z, mean=self.means[pos], cov=self.covs[pos])
 
     def sample_from(self, coordinates):
@@ -50,5 +48,5 @@ class NoiseMapNormal(NoiseMap):
         Args:
             coordinates: particles to find nearest positions from, which are used for sampling.
         """
-        pos = self.measurement_generator.get_closest_position(coordinates)
+        pos = self.gen.get_closest_position(coordinates)
         return multivariate_normal.rvs(mean=self.means[pos], cov=self.covs[pos])

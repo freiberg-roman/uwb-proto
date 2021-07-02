@@ -27,6 +27,9 @@ class BaseGenerator:
         """Finds indices in the map for the given coordinates.
 
         Method provides indices in the map for the underlying geometry of the location.
+
+        Attributes:
+            coordinates: coordinates to look up map position.
         """
         pass
 

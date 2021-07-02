@@ -9,11 +9,18 @@ from uwb.generator.base_gen import BaseGenerator
 
 
 class BlobGenerator(BaseGenerator):
-    """
-    Simple nD-generator for an rectangular grid of measurments. For each
-    position i*step_size x j*step_size for i,j in 1..grid_width // step_size,
-    1..grid_length // step_size measurments_per_location many measurments are
-    simulated by a k-blobs where k is randomly chosen from modal_range
+    """N-Dimensional Gaussian Mixture generator for a grid map.
+
+    Generator provides for predefined N dimensions a grid in a N dimensional cube. For each
+    position in the cube a fixed amount of samples are generated using Gaussian Mixtures.
+    The amount of mixture components can be specified in the :attr:`modal_range` of this class.
+
+    Attributes:
+        grid_dims: list of widths for N dimensions.
+        step_size: one dimensional distance between measurement positions.
+        measurements_per_location: number of measurements per position in grid.
+        model_range: tuple with minimum and maximum number of clusters.
+        deviation: standard deviation for Gaussian distribution.
     """
 
     def __init__(
@@ -24,6 +31,7 @@ class BlobGenerator(BaseGenerator):
         modal_range: Tuple[int, int],
         deviation: float = 10.0,
     ):
+        """Pre-allocates data structures for generation."""
         super().__init__()
         self.step = step_size
         self.amount = measurements_per_location
@@ -37,7 +45,8 @@ class BlobGenerator(BaseGenerator):
         for dim in grid_dims:
             self.grid.append((np.arange(dim) + 1) * step_size)
 
-    def gen(self) -> np.ndarray:
+    def gen(self):
+        """Initializes generation process."""
         prod = reduce((lambda x, y: x * y), self.grid_dims)  # multiplies all dimensions
         samples = np.zeros(self.grid_dims + [self.amount, len(self.grid_dims)])
         clusters = np.random.randint(
@@ -67,7 +76,13 @@ class BlobGenerator(BaseGenerator):
         return samples
 
     def get_closest_position(self, coordinates):
-        """Finds the closest positions in the grid map."""
+        """Finds the closest positions in the grid map.
+
+        Finds the closest (L2-norm) position in the grid.
+
+        Args:
+            coordinates: Numpy array (N, d) where N, d are batch size and dimensions respectively.
+        """
         assert coordinates.shape[1] == len(self.grid_dims)
         pos = np.empty(coordinates.shape[0], len(self.grid_dims))
 
@@ -84,11 +99,13 @@ class BlobGenerator(BaseGenerator):
         return pos
 
     def __iter__(self):
+        """Provides iterator for samples. Generation will be performed if not invoked previously"""
         if self._data is None:
             self.gen()
         return self
 
     def __next__(self):
+        """Measurements for next position in grid."""
         if self._iter is None:
             self._iter = product(*[range(i) for i in self.grid_dims])
         try:
@@ -104,4 +121,5 @@ class BlobGenerator(BaseGenerator):
 
     @property
     def shape(self):
+        """Underlying shape of data."""
         return tuple(self.grid_dims)

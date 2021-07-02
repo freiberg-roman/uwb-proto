@@ -2,9 +2,7 @@ import numpy as np
 
 
 def ess(weights):
-    """
-    note: array of shape (M,) of weights
-    """
+    """Computes effective sample size."""
 
     M = len(weights)
     CV = cv(weights)
@@ -12,5 +10,7 @@ def ess(weights):
 
 
 def cv(weights):
+    """Computes coefficient of variation."""
+
     M = len(weights)
     return np.mean((M * weights - 1) ** 2)

@@ -4,7 +4,11 @@ from uwb.generator import BaseGenerator
 
 
 class NoiseMap:
-    """Base class for noise maps"""
+    """Base class for noise maps
+
+    Attributes:
+        generator: measurement that can be accessed by an iterator.
+    """
 
     def __init__(self, generator: BaseGenerator):
         """Initializes the estimation of the parameters."""
@@ -17,9 +21,13 @@ class NoiseMap:
         """
         pass
 
-    def conditioned_probability(self, z, samples):
-        """"""
+    def conditioned_probability(self, z, particles):
+        """Computes conditioned probabilities p(z|x)
+
+        Computes conditioned probabilities where x is given from the map for each particle.
+        """
         pass
 
     def sample_from(self, coordinates):
+        """Samples from distributions of the map for given coordinates."""
         pass

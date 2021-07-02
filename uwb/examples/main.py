@@ -10,7 +10,7 @@ from uwb.map import NoiseMapGM, NoiseMapNormal
 def run(cfg: DictConfig):
     print(OmegaConf.to_yaml(cfg))
 
-    np.random.seed(0)
+    np.random.seed(cfg.seed)
     # generate multimodal data for a simple grid
     gen = BlobGenerator(
         [2, 2, 3],

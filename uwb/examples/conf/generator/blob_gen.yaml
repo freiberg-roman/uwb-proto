@@ -1,9 +1,8 @@
 # @package _group_
 name: "BlobGenerator"
 
-grid_width: 200
-grid_length: 100
-step_size: 10
+grid_dims: [5, 5, 10]
+step_size: 15
 measurements_per_location: 50
-modal_range: [1, 5]
-deviation:
+modal_range: (1, 5)
+deviation: 10

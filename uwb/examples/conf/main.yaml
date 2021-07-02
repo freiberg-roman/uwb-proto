@@ -4,6 +4,7 @@ defaults:
   - map: noise_map_gm
   - generator: blob_gen
 
+seed: 0
 
 root_dir: "./exp"
 hydra:

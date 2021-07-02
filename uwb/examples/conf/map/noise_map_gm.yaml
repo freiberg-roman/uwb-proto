@@ -1,0 +1,5 @@
+# @package _group_
+name: "NoiseMapGM"
+
+eps: 2
+min_samples: 3

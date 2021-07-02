@@ -2,6 +2,15 @@ import numpy as np
 
 
 class DynamicModel:
+    """Updates positions according to dynamic model.
+
+    Updates positions according to dynamic model described in paper of
+    `W. Suski <https://ieeexplore.ieee.org/document/6514113>`
+
+    Attributes:
+      std: Standard deviation used in dynamic model for updating velocities.
+    """
+
     def __init__(self, std=1):
         self.std = std
 

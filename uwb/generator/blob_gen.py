@@ -84,10 +84,10 @@ class BlobGenerator(BaseGenerator):
             coordinates: Numpy array (N, d) where N, d are batch size and dimensions respectively.
         """
         assert coordinates.shape[1] == len(self.grid_dims)
-        pos = np.empty(coordinates.shape[0], len(self.grid_dims))
+        pos = np.empty((coordinates.shape[0], len(self.grid_dims)))
 
         for i in range(len(self.grid_dims)):
-            i_pos = np.searchsorted(self.grid[i], coordinates[:, i], side="right")
+            i_pos = np.searchsorted(self.grid[i], coordinates[:, i], side="left")
             i_valid = (i_pos != 0) & (i_pos < len(self.grid[0]))
             i_pos = np.clip(i_pos, 0, len(self.grid[i]) - 1)
             i_dist_right = self.grid[i][i_pos] - coordinates[i]
@@ -96,7 +96,7 @@ class BlobGenerator(BaseGenerator):
 
             pos[:, i] = i_pos
 
-        return pos
+        return pos.astype(int)
 
     def __iter__(self):
         """Provides iterator for samples. Generation will be performed if not invoked previously"""

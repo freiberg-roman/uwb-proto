@@ -12,6 +12,8 @@ class MNMAParticleFilter(ParticleFilter):
     `W.Sluski <https://ieeexplore.ieee.org/document/6514113>`
 
     Attributes:
+        init_particles: initial positions for particles
+        init_weights: initial weights for particles
         map: Noise Map for location which was previously empirically estimated.
     """
 

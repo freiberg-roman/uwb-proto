@@ -26,11 +26,14 @@ class BasicParticleFilter(ParticleFilter):
 
         Args:
             z: measurements collected by sensor for weight updates
+                expected shape (N, d) where N is the batch size
         """
-        cov = np.tile(self.data_cov, (len(self.samples), 1))
-        self.weights = self.weights * multivariate_normal.pdf(
-            z, mean=self.samples, cov=cov
-        )
+        M = len(self.particles)
+        z = np.tile(z, (M, 1, 1))
+        cov = np.tile(self.data_cov, (M, 1))
+        self.weights = self.weights * np.prod(
+            multivariate_normal.pdf(z, mean=self.samples, cov=cov), axis=1
+        )  # iid assumption and product over batch dimension
 
         # normalize weights
         self.weights = self.weights / (np.sum(self.weights) + 1e-10)

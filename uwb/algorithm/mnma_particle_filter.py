@@ -24,9 +24,9 @@ class MNMAParticleFilter(ParticleFilter):
 
     def update_weights(self, z):
         """Updates weights according to map noise estimations"""
-        self.weights = self.weights * self.map.conditioned_probability(
-            z, self.particles
-        )
+        self.weights = self.weights * np.prod(
+            self.map.conditioned_probability(z, self.particles)
+        )  # iid assumption
 
         # normalize weights
         self.weights = self.weights / (np.sum(self.weights) + 1e-10)

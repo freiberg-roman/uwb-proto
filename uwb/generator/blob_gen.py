@@ -90,13 +90,13 @@ class BlobGenerator(BaseGenerator):
             i_pos = np.searchsorted(self.grid[i], coordinates[:, i], side="left")
             i_valid = (i_pos != 0) & (i_pos < len(self.grid[0]))
             i_pos = np.clip(i_pos, 0, len(self.grid[i]) - 1)
-            i_dist_right = self.grid[i][i_pos] - coordinates[i]
-            i_dist_left = coordinates[i] - self.grid[i][i_pos - 1]
+            i_dist_right = self.grid[i][i_pos] - coordinates[:, i]
+            i_dist_left = coordinates[:, i] - self.grid[i][i_pos - 1]
             i_pos[i_valid & (i_dist_right > i_dist_left)] -= 1
 
             pos[:, i] = i_pos
 
-        return pos.astype(int)
+        return pos.astype(int), (pos + 1) * self.step
 
     def __iter__(self):
         """Provides iterator for samples. Generation will be performed if not invoked previously"""

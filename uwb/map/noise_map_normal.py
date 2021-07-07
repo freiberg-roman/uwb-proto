@@ -18,14 +18,16 @@ class NoiseMapNormal(NoiseMap):
     def __init__(self, generator):
         """Inits and allocates numpy arrays for parameters."""
         super().__init__(generator)
-        self.means = np.zeros(generator.shape)
-        self.covs = np.zeros(generator.shape + (generator.shape[-1],))
+        self.means = np.zeros(generator.shape + (len(generator.shape),))
+        self.covs = np.zeros(
+            generator.shape + (len(generator.shape),) + (len(generator.shape),)
+        )
 
     def gen(self):
         """Calculates estimates for a gaussian distribution"""
-        for (samples, idxs, pos) in self.gen:
-            self.means[idxs[:-1]] = samples.mean(axis=0) - pos
-            self.covs[idxs[:-1]] = np.cov(samples.T)
+        for (samples, idxs, pos) in self.generator:
+            self.means[idxs] = samples.mean(axis=0) - pos
+            self.covs[idxs] = np.cov(samples.T)
 
     def conditioned_probability(self, z, particles):
         """Computes conditioned probabilities.
@@ -37,8 +39,21 @@ class NoiseMapNormal(NoiseMap):
             z: Numpy array of measurements with format (N,d).
             particles: particles from the particle filter used for density estimation.
         """
-        pos = self.gen.get_closest_position(particles)
-        return multivariate_normal.pdf(z, mean=self.means[pos], cov=self.covs[pos])
+        pos_coord, pos = self.generator.get_closest_position(particles)
+        probs = np.empty(len(pos))
+
+        # couldn't find a faster way.. suggestions are appreciated
+        for i, (measurement, p, mean, cov) in enumerate(
+            zip(
+                z,
+                pos,
+                self.means[tuple(pos_coord.T.tolist())],
+                self.covs[tuple(pos_coord.T.tolist())],
+            )
+        ):
+            probs[i] = multivariate_normal.pdf(measurement, mean=mean + p, cov=cov)
+
+        return probs
 
     def sample_from(self, coordinates):
         """Samples particles from a normal distribution.
@@ -48,5 +63,15 @@ class NoiseMapNormal(NoiseMap):
         Args:
             coordinates: particles to find nearest positions from, which are used for sampling.
         """
-        pos = self.gen.get_closest_position(coordinates)
-        return multivariate_normal.rvs(mean=self.means[pos], cov=self.covs[pos])
+        samples = np.empty((len(coordinates), self.means.shape[-1]))
+        pos_coord, pos = self.generator.get_closest_position(coordinates)
+        for i, (p, mean, cov) in enumerate(
+            zip(
+                pos,
+                self.means[tuple(pos_coord.T.tolist())],
+                self.covs[tuple(pos_coord.T.tolist())],
+            )
+        ):
+            samples[i] = multivariate_normal.rvs(mean=mean, cov=cov) + p
+
+        return samples

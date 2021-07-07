@@ -42,7 +42,7 @@ class NoiseMapGM(NoiseMap):
         If DBSCAN finds a cluster with less than :attr:`min_samples` samples, they will be thrown
         away.
         """
-        for (samples, idxs, pos) in self.gen:
+        for (samples, idxs, pos) in self.generator:
             db = self.db.fit(samples)
             core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
             core_samples_mask[db.core_sample_indices_] = True
@@ -73,13 +73,13 @@ class NoiseMapGM(NoiseMap):
 
         This is generally to slow for most applications. TODO C++/Numpy reimplementation.
         """
-        positions = self.gen.get_closest_position(coordinates)
-        samples = np.empty_like(positions)
-        for i, p in enumerate(positions):
+        pos_coords, pos = self.generator.get_closest_position(coordinates)
+        samples = np.empty_like(pos_coords)
+        for i, p in enumerate(pos_coords):
             weights, means, covs = self[p]
             selection = np.random.choice(np.arange(len(weights)), p=weights)
-            samples[(i,) + p] = multivariate_normal.rvs(
-                mean=means[selection], cov=covs[selection]
+            samples[i] = multivariate_normal.rvs(
+                mean=means[selection] + pos[i], cov=covs[selection]
             )
         return samples
 
@@ -89,12 +89,14 @@ class NoiseMapGM(NoiseMap):
         See :class:`uwb.map.NoiseMap` and :class:`uwb.map.NoiseMapNormal` for more information.
         This is generally to slow for most applications. TODO C++/Numpy reimplementation.
         """
-        positions = self.gen.get_closest_position(particles)
+        pos_coords, pos = self.generator.get_closest_position(particles)
         prob = np.zeros((len(z)))
-        for i, p in enumerate(positions):
+        for i, p in enumerate(pos_coords):
             weights, means, covs = self[p]
-            for w in enumerate(weights):
-                prob += w * multivariate_normal.pdf(mean=means[i], cov=covs[i])
+            for j, w in enumerate(weights):
+                prob[i] += w * multivariate_normal.pdf(
+                    z[i], mean=means[j] + pos[i], cov=covs[j]
+                )
         return prob
 
     def __getitem__(self, item):

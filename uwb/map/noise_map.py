@@ -12,7 +12,7 @@ class NoiseMap:
 
     def __init__(self, generator: BaseGenerator):
         """Initializes the estimation of the parameters."""
-        self.gen = generator
+        self.generator = generator
 
     def get_params(self, coordinates: np.array):
         """Returns list of lists with parameter estimates for the given coordinates.

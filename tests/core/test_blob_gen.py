@@ -65,7 +65,7 @@ def test_closest_position_in_grid():
         [[0.0, 0.0, 1.0], [100.0, 100.0, 100.0], [11.0, 16.0, 30.0]]
     )
 
-    pos = bg.get_closest_position(to_find_locations)
+    pos, _ = bg.get_closest_position(to_find_locations)
     assert tuple(np.asarray(pos[0])) == (0, 0, 0)  # position (10, 10, 10)
     assert tuple(np.asarray(pos[1])) == (1, 3, 5)  # position (20, 40, 60)
     assert tuple(np.asarray(pos[2])) == (0, 1, 2)  # position (10, 20, 30)

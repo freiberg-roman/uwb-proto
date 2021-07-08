@@ -9,7 +9,7 @@ def test_update_weights():
         np.ones(10) * 0.1,
     )
 
-    bpf.update_weight(np.array([[1.0, 1.0, 1.0], [2.0, 2.0, 2.0]]))
+    bpf.update_weights(np.array([[1.0, 1.0, 1.0], [2.0, 2.0, 2.0]]))
     assert np.abs(np.sum(bpf.weights) - 1) < 1e-3
 
 
@@ -19,7 +19,7 @@ def test_resample():
         np.ones(10) * 0.1,
     )
 
-    bpf.update_weight(np.array([[1.0, 1.0, 1.0], [2.0, 2.0, 2.0]]))
+    bpf.update_weights(np.array([[1.0, 1.0, 1.0], [2.0, 2.0, 2.0]]))
     assert np.abs(np.sum(bpf.weights) - 1) < 1e-3
 
     bpf.resample()

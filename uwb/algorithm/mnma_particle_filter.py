@@ -24,12 +24,15 @@ class MNMAParticleFilter(ParticleFilter):
 
     def update_weights(self, z):
         """Updates weights according to map noise estimations"""
-        self.weights = self.weights * np.prod(
-            self.map.conditioned_probability(z, self.particles)
-        )  # iid assumption
+        for i in range(len(self.particles)):
+            self.weights[i] *= np.prod(
+                self.map.conditioned_probability(
+                    z, np.tile(self.particles[i], (len(z), 1))
+                )
+            )  # iid assumption
 
         # normalize weights
-        self.weights = self.weights / (np.sum(self.weights) + 1e-10)
+        self.weights = self.weights / np.sum(self.weights)
 
     def resample(self):
         """Resamples particles."""
@@ -37,7 +40,7 @@ class MNMAParticleFilter(ParticleFilter):
         acc_weights = np.cumsum(self.weights)
         acc_weights[-1] = 1  # in case of rounding errors
 
-        uniform_samples = np.random.uniform(M)  # samples uniform from [0,1)
+        uniform_samples = np.random.uniform(0.0, 1.0, M)  # samples uniform from [0,1)
         positions = np.searchsorted(
             acc_weights, uniform_samples
         )  # find matching positions

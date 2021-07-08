@@ -21,7 +21,7 @@ class BasicParticleFilter(ParticleFilter):
         super().__init__(init_particles, init_weights)
         self.data_cov = np.cov(init_particles.T)
 
-    def update_weight(self, z):
+    def update_weights(self, z):
         """Update weights particles as means and covariance of data distribution
 
         Args:

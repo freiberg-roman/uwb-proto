@@ -1,0 +1,5 @@
+# @package _group_
+name: "FileMeasurements"
+
+file: "measurements/test_measurements.csv"
+batch_size: 3

@@ -1,0 +1,6 @@
+# @package _group_
+name: "RngSensorMeasurements"
+
+ranges: (0.0, 1.0)
+amount: 100
+dim: 3

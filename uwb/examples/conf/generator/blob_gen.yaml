@@ -4,5 +4,5 @@ name: "BlobGenerator"
 grid_dims: [5, 5, 10]
 step_size: 15
 measurements_per_location: 50
-modal_range: (1, 5)
+modal_range: [1, 5]
 deviation: 1.0

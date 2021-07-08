@@ -31,7 +31,7 @@ class MNMAParticleFilter(ParticleFilter):
                 )
             )  # iid assumption
 
-        # normalize weights
+        # normalize weights ... numerical instabilities may happen here
         self.weights = self.weights / np.sum(self.weights)
 
     def resample(self):

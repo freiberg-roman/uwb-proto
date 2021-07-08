@@ -60,7 +60,7 @@ class BlobGenerator(BaseGenerator):
             np.random.randn(self.range[1], prod, len(self.grid_dims)) * self.deviation
         )
         centers = (noise + mean).reshape(
-            [self.range[1]] + self.grid_dims + [len(self.grid_dims)]
+            [self.range[1]] + list(self.grid_dims) + [len(list(self.grid_dims))]
         )
 
         # transpose hack for selection

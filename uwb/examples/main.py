@@ -9,9 +9,7 @@ from uwb.map import NoiseMapGM, NoiseMapNormal
 
 def get_initial_particles():
     """This method needs to be linked to the source of initial particles and weights"""
-    p = (
-        np.stack([np.arange(10), (np.arange(10) + 1) ** 2, (np.arange(10) + 5) ** 3]).T,
-    )
+    p = np.stack([np.arange(10), (np.arange(10) + 1) ** 2, (np.arange(10) + 5) ** 3]).T
     w = np.ones(10) * 0.1
     return p, w
 
@@ -35,26 +33,28 @@ def run(cfg: DictConfig):
         noise_map = NoiseMapNormal(generator=generator)
     elif cfg.map.name == "NoiseMapGM":
         noise_map = NoiseMapGM(
-            generator=generator, eps=cfg.map.eps, min_samples=cfg.map.mini_samples
+            generator=generator, eps=cfg.map.eps, min_samples=cfg.map.min_samples
         )
     else:
         raise ValueError("No noise map provided")
     noise_map.gen()
 
+    particles, weights = get_initial_particles()
     if cfg.algorithm.name == "BasicParticleFilter":
-        pf = BasicParticleFilter(
-            *get_initial_particles(),
-        )
+        pf = BasicParticleFilter(particles, weights)
     elif cfg.algorithm.name == "MNMAParticleFilter":
         pf = MNMAParticleFilter(
-            *get_initial_particles(),
+            particles,
+            weights,
             map=noise_map,
         )
     else:
         raise ValueError("No particle filter provided")
 
     if cfg.measurements.name == "FileMeasurements":
-        measurement_generator = FileMeasurements(cfg.measurements.file, 3)
+        measurement_generator = FileMeasurements(
+            cfg.measurements.file, cfg.measurements.batch_size
+        )
     elif cfg.measurements.name == "RngSensorMeasurements":
         measurement_generator = RngSensorMeasurements(
             cfg.measurements.ranges, cfg.measurements.amount, cfg.measurements.dim

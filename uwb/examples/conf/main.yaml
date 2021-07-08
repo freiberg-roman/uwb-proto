@@ -6,7 +6,7 @@ defaults:
   - measurements: file_measurements
 
 seed: 0
-resample_each: 2
+resample_each: 1
 
 root_dir: "./exp"
 hydra:

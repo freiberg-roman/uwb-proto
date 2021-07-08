@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import multivariate_normal
 
-from uwb.algorithm import ParticleFilter
+from uwb.algorithm.particle_filter import ParticleFilter
 
 
 class BasicParticleFilter(ParticleFilter):
@@ -19,7 +19,7 @@ class BasicParticleFilter(ParticleFilter):
     def __init__(self, init_particles, init_weights):
         """Initialized and computes data covariance."""
         super().__init__(init_particles, init_weights)
-        self.data_cov = np.cov(init_particles)
+        self.data_cov = np.cov(init_particles.T)
 
     def update_weight(self, z):
         """Update weights particles as means and covariance of data distribution
@@ -28,30 +28,34 @@ class BasicParticleFilter(ParticleFilter):
             z: measurements collected by sensor for weight updates
                 expected shape (N, d) where N is the batch size
         """
-        M = len(self.particles)
-        z = np.tile(z, (M, 1, 1))
-        cov = np.tile(self.data_cov, (M, 1))
-        self.weights = self.weights * np.prod(
-            multivariate_normal.pdf(z, mean=self.samples, cov=cov), axis=1
-        )  # iid assumption and product over batch dimension
+        # unfortunately normal implementation doesn't seem to support batch dim
+        # needs to be reimplemented for performance reasons
+        for item in z:
+            for i, p in enumerate(self.particles):
+                self.weights[i] *= multivariate_normal.pdf(
+                    item, mean=p, cov=self.data_cov
+                )
+            self.weights = self.weights / np.sum(self.weights)
 
         # normalize weights
-        self.weights = self.weights / (np.sum(self.weights) + 1e-10)
 
     def resample(self):
         """Resampling according to weights of particles"""
-        M = len(self.samples)
+        M = len(self.particles)
         acc_weights = np.cumsum(self.weights)
         acc_weights[-1] = 1  # in case of rounding errors
 
-        uniform_samples = np.random.uniform(M)  # samples uniform from [0,1)
+        uniform_samples = np.random.uniform(0.0, 1.0, M)  # samples uniform from [0,1)
         positions = np.searchsorted(
             acc_weights, uniform_samples
         )  # find matching positions
-        self.particles = multivariate_normal.rvs(
-            mean=self.samples[positions], cov=self.data_cov
-        )
+
+        # again same problem as in update_weigth
+        for i, p in enumerate(positions):
+            self.particles[i] = multivariate_normal.rvs(
+                mean=self.particles[p], cov=self.data_cov
+            )
 
         # update covariance
-        self.data_cov = np.cov(self.samples)
+        self.data_cov = np.cov(self.particles.T)
         self.weights = np.ones_like(self.weights) * (1 / M)

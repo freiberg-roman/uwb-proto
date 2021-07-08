@@ -1,6 +1,6 @@
 import numpy as np
 
-from uwb.algorithm import ParticleFilter
+from uwb.algorithm.particle_filter import ParticleFilter
 from uwb.map import NoiseMap
 
 

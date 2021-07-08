@@ -8,14 +8,18 @@ class RngSensorMeasurements:
     sensor input.
     """
 
-    def __init__(self, ranges, amount):
+    def __init__(self, ranges, amount, dim):
         """Initializes ranges."""
         self.ranges = ranges
         self.amount = amount
+        self.dim = dim
 
     def __next__(self):
-        return np.random.uniform(
-            low=self.ranges[0],
-            high=self.ranges[1],
-            size=(self.amount, len(self.ranges)),
+        return np.tile(
+            np.random.uniform(
+                low=self.ranges[0],
+                high=self.ranges[1],
+                size=(self.amount, self.dim),
+            ),
+            (1, 1),
         )

@@ -63,7 +63,7 @@ def run(cfg: DictConfig):
     for i, mb in enumerate(measurement_generator):
         pf.update_weights(mb)
 
-        if i % cfg.resample_each:
+        if i % cfg.resample_each == 0:
             pf.resample()
 
 

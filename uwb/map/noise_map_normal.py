@@ -63,7 +63,7 @@ class NoiseMapNormal(NoiseMap):
         Args:
             coordinates: particles to find nearest positions from, which are used for sampling.
         """
-        samples = np.empty((len(coordinates), self.means.shape[-1]))
+        samples = np.empty((len(coordinates), self.means.shape[-1]), dtype=float)
         pos_coord, pos = self.generator.get_closest_position(coordinates)
         for i, (p, mean, cov) in enumerate(
             zip(

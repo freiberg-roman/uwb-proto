@@ -74,7 +74,7 @@ class NoiseMapGM(NoiseMap):
         This is generally to slow for most applications. TODO C++/Numpy reimplementation.
         """
         pos_coords, pos = self.generator.get_closest_position(coordinates)
-        samples = np.empty_like(pos_coords)
+        samples = np.empty(pos_coords.shape, dtype=float)
         for i, p in enumerate(pos_coords):
             weights, means, covs = self[p]
             selection = np.random.choice(np.arange(len(weights)), p=weights)

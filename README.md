@@ -15,7 +15,7 @@ Optional: Create conda environment with
 Standard installation with pip
 
     git clone https://github.com/freiberg-roman/uwb-proto.git
-    cd uwb
+    cd uwb-proto
     pip install -e ".[dev]"
 
 Test installation by running
@@ -27,3 +27,12 @@ Test installation by running
 ### Usage
 
 Check out the notebooks for example use cases.
+
+The exaple pipeline uses [Hydra](https://github.com/facebookresearch/hydra) configurations which allow the exchange of components
+from the command line. As an example one can run.
+
+    python -m uwb.examples.main map=noise_map_gm
+    # or
+    python -m uwb.examples.main map=noise_map_normal
+    
+to exchange the map from a Gaussian Mixture model to a unimodal normal distribution. See the configuration files for all availible options.
